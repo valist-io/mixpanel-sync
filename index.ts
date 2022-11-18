@@ -82,60 +82,44 @@ const main = async () => {
     // import mainnet data
     for (let page = 0; page <= maxPages; page++) {
         console.log('mainnet data page', page);
-        try {
-            const mainnetData = await getData(page);
-            if (mainnetData.length > 0) {
-                await sdk.importEvents(mainnetData, { project_id, 'content-encoding': 'gzip' });
-            } else {
-                break;
-            }
-        } catch (e) {
-            console.error(e);
+        const mainnetData = await getData(page);
+        if (mainnetData.length > 0) {
+            await sdk.importEvents(mainnetData, { project_id, 'content-encoding': 'gzip' });
+        } else {
+            break;
         }
     }
 
     // import testnet data
     for (let page = 0; page <= maxPages; page++) {
         console.log('testnet data page', page);
-        try {
-            const testnetData = await getData(page, true);
-            if (testnetData.length > 0) {
-                await sdk.importEvents(testnetData, { project_id, 'content-encoding': 'gzip' });
-            } else {
-                break;
-            }
-        } catch (e) {
-            console.error(e);
+        const testnetData = await getData(page, true);
+        if (testnetData.length > 0) {
+            await sdk.importEvents(testnetData, { project_id, 'content-encoding': 'gzip' });
+        } else {
+            break;
         }
     }
 
     // import mainnet account profile data
     for (let page = 0; page <= maxPages; page++) {
         console.log('mainnet accounts page', page);
-        try {
-            const mainnetAccounts = await getAccounts(page);
-            if (mainnetAccounts.length > 0) {
-                await sdk.profileBatchUpdate(mainnetAccounts, {accept: 'text/plain'});
-            } else {
-                break;
-            }
-        } catch (e) {
-            console.error(e);
+        const mainnetAccounts = await getAccounts(page);
+        if (mainnetAccounts.length > 0) {
+            await sdk.profileBatchUpdate(mainnetAccounts, {accept: 'text/plain'});
+        } else {
+            break;
         }
     }
 
     // import testnet account profile data
     for (let page = 0; page <= maxPages; page++) {
         console.log('testnet accounts page', page);
-        try {
-            const testnetAccounts = await getAccounts(page, true);
-            if (testnetAccounts.length > 0) {
-                await sdk.profileBatchUpdate(testnetAccounts, {accept: 'text/plain'});
-            } else {
-                break;
-            }
-        } catch (e) {
-            console.error(e);
+        const testnetAccounts = await getAccounts(page, true);
+        if (testnetAccounts.length > 0) {
+            await sdk.profileBatchUpdate(testnetAccounts, {accept: 'text/plain'});
+        } else {
+            break;
         }
     }
 

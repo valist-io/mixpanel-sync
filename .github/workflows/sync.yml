@@ -21,3 +21,6 @@ jobs:
 
       - name: Run sync script
         run: npm run start
+        env:
+          MIXPANEL_ACCOUNT: ${{ secrets.MIXPANEL_ACCOUNT }}
+          MIXPANEL_SECRET: ${{ secrets.MIXPANEL_SECRET }}
