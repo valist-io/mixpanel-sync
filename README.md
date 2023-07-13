@@ -1,6 +1,6 @@
 # Valist Mixpanel Sync
 
-This tool synchronizes the Valist Subgraph data with Mixpanel.
+This tool synchronizes the Valist Subgraph data with Mixpanel. :)
 
 ## Requirements
 
