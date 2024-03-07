@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { filterAddresses, logsQuery, accountsQuery } from './graphql';
-
 require('dotenv').config();
 
 const sdk = require('api')('@mixpaneldevdocs/v3.08#260uf4wkzq3unav');
@@ -24,10 +23,10 @@ type LogEntry = {
             id: string,
             name: string,
         },
-    }
+    },
     sender: string,
     blockTime: string,
-}
+};
 
 const getAccounts = async (page: number = 0, testnet: boolean = false) => {
     const gql = JSON.stringify({
@@ -48,23 +47,15 @@ const parseAccounts = (account: { id: string, name: string, blockTime: string })
             "account_name": account.name,
             "created_at": new Date(Number(account.blockTime) * 1000)
         }
-    }
-}
-
-const getData = async (page: number = 0, testnet: boolean = false) => {
-    const gql: string = JSON.stringify({
-        query: logsQuery,
-        variables: { first: 1000, skip: page == 0 ? 0 : page * 1000, filterAddresses },
-    });
-    const resp = await axios.post(`https://api.thegraph.com/subgraphs/name/valist-io/valist${testnet ? 'mumbai' : ''}`, gql);
-    return resp.data.data.logs.map(parseEvent) as LogEntry[];
-}
+    };
+};
 
 const parseEvent = (log: LogEntry) => {
     return {
         event: log.type,
         properties: {
             time: Number(log.blockTime) * 1000,
+            blockTime: log.blockTime,
             distinct_id: log.account?.id || log.project.account.id,
             "$insert_id": log.id,
             account_id: log.account?.id || log.project.account.id,
@@ -73,32 +64,39 @@ const parseEvent = (log: LogEntry) => {
             project_name: log.project?.name || '',
         }
     };
-}
+};
+
+const fetchData = async (lastBlockTime: string = '1646441277', testnet: boolean = false) => {
+    const gql = JSON.stringify({
+        query: logsQuery,
+        variables: { first: 1000, lastBlockTime, filterAddresses },
+    });
+    const subgraphUrl = `https://api.thegraph.com/subgraphs/name/valist-io/valist${testnet ? 'mumbai' : ''}`;
+    const resp = await axios.post(subgraphUrl, gql);
+    return resp.data.data.logs.map(parseEvent);
+};
 
 const main = async () => {
-
+    let lastBlockTime = '1646441277'; // Initial blockTime
+    const maxIterations = 100;
     const maxPages = 100;
+    const projectSettings = { project_id, 'content-encoding': 'gzip' };
 
-    // import mainnet data
-    for (let page = 0; page <= maxPages; page++) {
-        console.log('mainnet data page', page);
-        const mainnetData = await getData(page);
-        if (mainnetData.length > 0) {
-            await sdk.importEvents(mainnetData, { project_id, 'content-encoding': 'gzip' });
-        } else {
-            break;
-        }
+    for (let iteration = 0; iteration < maxIterations; iteration++) {
+        console.log('mainnet iteration', iteration);
+        const data = await fetchData(lastBlockTime, false);
+        if (!data || data.length === 0) break;
+        await sdk.importEvents(data, projectSettings);
+        lastBlockTime = data[data.length - 1].properties.blockTime.toString();
     }
 
-    // import testnet data
-    for (let page = 0; page <= maxPages; page++) {
-        console.log('testnet data page', page);
-        const testnetData = await getData(page, true);
-        if (testnetData.length > 0) {
-            await sdk.importEvents(testnetData, { project_id, 'content-encoding': 'gzip' });
-        } else {
-            break;
-        }
+    lastBlockTime = '1646441277'; // Reset for testnet
+    for (let iteration = 0; iteration < maxIterations; iteration++) {
+        console.log('testnet iteration', iteration);
+        const data = await fetchData(lastBlockTime, true);
+        if (!data || data.length === 0) break;
+        await sdk.importEvents(data, projectSettings);
+        lastBlockTime = data[data.length - 1].properties.blockTime.toString();
     }
 
     // import mainnet account profile data
@@ -122,7 +120,6 @@ const main = async () => {
             break;
         }
     }
-
-}
+};
 
 main();

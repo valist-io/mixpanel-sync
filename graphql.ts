@@ -17,27 +17,24 @@ export const filterAddresses = [
   ];
 
 export const logsQuery = `
-query Apps($order: String, $first: Int, $skip: Int, $filterAddresses: [String]) {
-    logs(first: $first, skip: $skip, orderBy: blockTime, orderDirection: $order,
-        where: {
-            sender_not_in: $filterAddresses
-        }) {
+query Logs($first: Int, $lastBlockTime: BigInt, $filterAddresses: [String!]) {
+    logs(first: $first, where: {blockTime_gt: $lastBlockTime, sender_not_in: $filterAddresses}, orderBy: blockTime, orderDirection: asc) {
+        id
+        type
+        account {
             id
-            type
+            name
+        }
+        project {
+            id
+            name
             account {
                 id
                 name
             }
-            project {
-                id
-                name
-                account {
-                    id
-                    name
-                }
-            }
-            sender
-            blockTime
+        }
+        sender
+        blockTime
     }
 }
 `;
