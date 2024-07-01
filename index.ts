@@ -33,7 +33,7 @@ const getAccounts = async (page: number = 0, testnet: boolean = false) => {
         query: accountsQuery,
         variables: { first: 1000, skip: page == 0 ? 0 : page * 1000 },
     });
-    const resp = await axios.post(`https://gateway-arbitrum.network.thegraph.com/api/e6b717ae2cd21ab9b06b792eaabee06f/subgraphs/id/88cRsVabPiks1qmwJ1vPJVJKsWD5M3Z7nvdUSTkmA51f}`, gql);
+    const resp = await axios.post(`https://gateway-arbitrum.network.thegraph.com/api/e6b717ae2cd21ab9b06b792eaabee06f/subgraphs/id/88cRsVabPiks1qmwJ1vPJVJKsWD5M3Z7nvdUSTkmA51f`, gql);
     return resp.data.data.accounts.map(parseAccounts);
 }
 
