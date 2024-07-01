@@ -33,7 +33,7 @@ const getAccounts = async (page: number = 0, testnet: boolean = false) => {
         query: accountsQuery,
         variables: { first: 1000, skip: page == 0 ? 0 : page * 1000 },
     });
-    const resp = await axios.post(`https://api.thegraph.com/subgraphs/name/valist-io/valist${testnet ? 'mumbai' : ''}`, gql);
+    const resp = await axios.post(`https://gateway-arbitrum.network.thegraph.com/api/e6b717ae2cd21ab9b06b792eaabee06f/subgraphs/id/88cRsVabPiks1qmwJ1vPJVJKsWD5M3Z7nvdUSTkmA51f}`, gql);
     return resp.data.data.accounts.map(parseAccounts);
 }
 
@@ -90,14 +90,14 @@ const main = async () => {
         lastBlockTime = data[data.length - 1].properties.blockTime.toString();
     }
 
-    lastBlockTime = '1646441277'; // Reset for testnet
-    for (let iteration = 0; iteration < maxIterations; iteration++) {
-        console.log('testnet iteration', iteration);
-        const data = await fetchData(lastBlockTime, true);
-        if (!data || data.length === 0) break;
-        await sdk.importEvents(data, projectSettings);
-        lastBlockTime = data[data.length - 1].properties.blockTime.toString();
-    }
+    // lastBlockTime = '1646441277'; // Reset for testnet
+    // for (let iteration = 0; iteration < maxIterations; iteration++) {
+    //     console.log('testnet iteration', iteration);
+    //     const data = await fetchData(lastBlockTime, true);
+    //     if (!data || data.length === 0) break;
+    //     await sdk.importEvents(data, projectSettings);
+    //     lastBlockTime = data[data.length - 1].properties.blockTime.toString();
+    // }
 
     // import mainnet account profile data
     for (let page = 0; page <= maxPages; page++) {
@@ -111,15 +111,15 @@ const main = async () => {
     }
 
     // import testnet account profile data
-    for (let page = 0; page <= maxPages; page++) {
-        console.log('testnet accounts page', page);
-        const testnetAccounts = await getAccounts(page, true);
-        if (testnetAccounts.length > 0) {
-            await sdk.profileBatchUpdate(testnetAccounts, {accept: 'text/plain'});
-        } else {
-            break;
-        }
-    }
+    // for (let page = 0; page <= maxPages; page++) {
+    //     console.log('testnet accounts page', page);
+    //     const testnetAccounts = await getAccounts(page, true);
+    //     if (testnetAccounts.length > 0) {
+    //         await sdk.profileBatchUpdate(testnetAccounts, {accept: 'text/plain'});
+    //     } else {
+    //         break;
+    //     }
+    // }
 };
 
 main();
