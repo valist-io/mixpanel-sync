@@ -71,7 +71,7 @@ const fetchData = async (lastBlockTime: string = '1646441277', testnet: boolean 
         query: logsQuery,
         variables: { first: 1000, lastBlockTime, filterAddresses },
     });
-    const subgraphUrl = `https://api.thegraph.com/subgraphs/name/valist-io/valist${testnet ? 'mumbai' : ''}`;
+    const subgraphUrl = `https://gateway-arbitrum.network.thegraph.com/api/e6b717ae2cd21ab9b06b792eaabee06f/subgraphs/id/88cRsVabPiks1qmwJ1vPJVJKsWD5M3Z7nvdUSTkmA51f`;
     const resp = await axios.post(subgraphUrl, gql);
     return resp.data.data.logs.map(parseEvent);
 };
